@@ -1,7 +1,10 @@
 #include <Arduino.h>
 
-// put function declarations here:
-int myFunction(int, int);
+
+void parpadearLedRojo();
+void actualizarBotonRojo(); // Declaración de la función para el botón rojo
+void parpadearLedAzul();
+void actualizarBotonAzul(); // Declaración de la función para el botón azul
 
 const int led_rojo = 0; // Pin number for the LED
 const int led_azul = 1; // Pin number for the LED
@@ -11,29 +14,31 @@ const int btn_azul = 10; // Pin number for the button
 
 
 bool ledRojoParpadeando = false; // Estado del LED rojo (parpadeando o apagado)
-unsigned long tiempoAnterior = 0; // Para controlar el parpadeo
+bool ledAzulParpadeando = false; // Estado del LED azul (encendido o apagado)
+unsigned long tiempoAnteriorLedRojo = 0; 
+unsigned long tiempoAnteriorLedAzul = 0; 
 const unsigned long intervaloParpadeo = 500; // Intervalo de parpadeo en milisegundos
 
 
 void setup() {
-    // put your setup code here, to run once:
-    int result = myFunction(2, 3);
+    
     pinMode(led_rojo, OUTPUT);
     pinMode(led_azul, OUTPUT);
 
+    //digitalWrite(led_rojo, HIGH);
+    //digitalWrite(led_azul, HIGH);
+
+
     pinMode(btn_rojo, INPUT);
     pinMode(btn_azul, INPUT);
-
-
 }
 
 void loop() {
-    
-     // Verificar si el botón rojo fue presionado
-     if (digitalRead(btn_rojo) == LOW) { // Botón presionado (LOW debido a INPUT_PULLUP)
-        delay(200); // Pequeño retraso para evitar rebotes
-        ledRojoParpadeando = !ledRojoParpadeando; // Cambiar el estado
-    }
+
+    // Verificar si el botón rojo fue presionado
+    actualizarBotonRojo();
+    // Verificar si el botón azul fue presionado
+    actualizarBotonAzul();
 
     // Controlar el LED rojo según el estado
     if (ledRojoParpadeando) {
@@ -41,34 +46,58 @@ void loop() {
     } else {
         digitalWrite(led_rojo, LOW); // Apagar el LED
     }
+
+    // Controlar el LED azul según el estado
+    if (ledAzulParpadeando) {
+        parpadearLedAzul();
+    } else {
+        digitalWrite(led_azul, LOW); // Apagar el LED
+    }
+    
 }
 
-// Controlar el botón rojo sin delay
-void actualizarBotonRojo(){
-    static unsigned long tiempoAnteriorBoton = 0; // Para controlar el debounce
-    const unsigned long debounceDelay = 50; // Tiempo de debounce en milisegundos
+void actualizarBotonRojo() {
+    static unsigned long tiempoAnteriorBotonRojo = 0; // Para controlar el debounce
+    const unsigned long debounceDelay = 100; // Tiempo de debounce en milisegundos
 
     // Leer el estado del botón y verificar si ha cambiado
-    if (digitalRead(btn_rojo) == LOW) { // Botón presionado
-        if (millis() - tiempoAnteriorBoton >= debounceDelay) { // Evitar rebotes
+    if (digitalRead(btn_rojo) == HIGH) { // Botón presionado
+        if (millis() - tiempoAnteriorBotonRojo >= debounceDelay) { // Evitar rebotes
             ledRojoParpadeando = !ledRojoParpadeando; // Cambiar el estado
-            tiempoAnteriorBoton = millis(); // Actualizar el tiempo del último cambio
+            tiempoAnteriorBotonRojo = millis(); // Actualizar el tiempo del último cambio
         }
     }
 }
 
+void actualizarBotonAzul() {
+    static unsigned long tiempoAnteriorBotonAzul = 0; // Para controlar el debounce
+    const unsigned long debounceDelay = 100; // Tiempo de debounce en milisegundos
+
+    // Leer el estado del botón y verificar si ha cambiado
+    if (digitalRead(btn_azul) == HIGH) { // Botón presionado
+        if (millis() - tiempoAnteriorBotonAzul >= debounceDelay) { // Evitar rebotes
+           ledAzulParpadeando = !ledAzulParpadeando; // Cambiar el estado
+           tiempoAnteriorBotonAzul = millis(); // Actualizar el tiempo del último cambio
+        }
+    } 
+}
 
 // Función para hacer que el LED rojo parpadee
 void parpadearLedRojo() {
     unsigned long tiempoActual = millis(); // Obtener el tiempo actual
-    if (tiempoActual - tiempoAnterior >= intervaloParpadeo) {
-        tiempoAnterior = tiempoActual; // Actualizar el tiempo
+    if (tiempoActual - tiempoAnteriorLedRojo >= intervaloParpadeo) {
+        tiempoAnteriorLedRojo = tiempoActual; // Actualizar el tiempo
         int estadoActual = digitalRead(led_rojo); // Leer el estado actual del LED
         digitalWrite(led_rojo, !estadoActual); // Cambiar el estado del LED
     }
 }
 
-// put function definitions here:
-int myFunction(int x, int y) {
-    return x + y;
+void parpadearLedAzul() {
+    unsigned long tiempoActual = millis(); // Obtener el tiempo actual
+    if (tiempoActual - tiempoAnteriorLedAzul >= intervaloParpadeo) {
+        tiempoAnteriorLedAzul = tiempoActual; // Actualizar el tiempo
+        int estadoActual = digitalRead(led_azul); // Leer el estado actual del LED
+        digitalWrite(led_azul, !estadoActual); // Cambiar el estado del LED
+    }
 }
+
