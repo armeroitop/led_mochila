@@ -19,16 +19,17 @@ unsigned long tiempoAnteriorLedRojo = 0;
 unsigned long tiempoAnteriorLedAzul = 0; 
 const unsigned long intervaloParpadeo = 500; // Intervalo de parpadeo en milisegundos
 
+unsigned long tiempoAnteriorBotonRojo = 0;
+unsigned long tiempoAnteriorBotonAzul = 0; // Para controlar el debounce
+
+const unsigned long debounceDelay = 300; // Tiempo de debounce en milisegundos
 
 void setup() {
     
     pinMode(led_rojo, OUTPUT);
     pinMode(led_azul, OUTPUT);
 
-    //digitalWrite(led_rojo, HIGH);
-    //digitalWrite(led_azul, HIGH);
-
-
+    
     pinMode(btn_rojo, INPUT);
     pinMode(btn_azul, INPUT);
 }
@@ -57,8 +58,6 @@ void loop() {
 }
 
 void actualizarBotonRojo() {
-    static unsigned long tiempoAnteriorBotonRojo = 0; // Para controlar el debounce
-    const unsigned long debounceDelay = 100; // Tiempo de debounce en milisegundos
 
     // Leer el estado del botón y verificar si ha cambiado
     if (digitalRead(btn_rojo) == HIGH) { // Botón presionado
@@ -70,9 +69,6 @@ void actualizarBotonRojo() {
 }
 
 void actualizarBotonAzul() {
-    static unsigned long tiempoAnteriorBotonAzul = 0; // Para controlar el debounce
-    const unsigned long debounceDelay = 100; // Tiempo de debounce en milisegundos
-
     // Leer el estado del botón y verificar si ha cambiado
     if (digitalRead(btn_azul) == HIGH) { // Botón presionado
         if (millis() - tiempoAnteriorBotonAzul >= debounceDelay) { // Evitar rebotes
